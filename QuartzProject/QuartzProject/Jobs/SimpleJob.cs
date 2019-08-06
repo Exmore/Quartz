@@ -10,16 +10,16 @@ namespace QuartzProject.Jobs
     {
         public async Task Execute(IJobExecutionContext context)
         {
+            Thread.Sleep(2000);
+
             JobDataMap dataMap = context.MergedJobDataMap;
 
             string triggerparam = dataMap.GetString("triggerparam");
             var user = (SimpleJobParameter)dataMap.Get("user");
 
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine($"Hello from job. UserName = {user.UserName}, Password = {user.Password}. TriggerParama = {triggerparam}");
-            Console.ResetColor();
-
-            Thread.Sleep(2000);
+            Console.WriteLine($"Hello from job. UserName = {user?.UserName}, Password = {user?.Password}. TriggerParama = {triggerparam}");
+            Console.ResetColor();            
         }
     }
 }

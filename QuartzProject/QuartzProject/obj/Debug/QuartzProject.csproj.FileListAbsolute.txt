@@ -27,4 +27,3 @@ D:\Projects\Quartz\QuartzProject\QuartzProject\obj\Debug\QuartzProject.csproj.Co
 D:\Projects\Quartz\QuartzProject\QuartzProject\obj\Debug\QuartzProject.csproj.CopyComplete
 D:\Projects\Quartz\QuartzProject\QuartzProject\obj\Debug\QuartzProject.exe
 D:\Projects\Quartz\QuartzProject\QuartzProject\obj\Debug\QuartzProject.pdb
-D:\Projects\Quartz\QuartzProject\QuartzProject\obj\Debug\QuartzProject.csprojAssemblyReference.cache
