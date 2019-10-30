@@ -1,98 +1,86 @@
-﻿using Oracle.ManagedDataAccess.Client;
-using Quartz;
-using Quartz.Impl;
-using QuartzProject.Jobs;
-using QuartzProject.Models;
+﻿using QuartzProject.Actions;
 using System;
-using System.Collections.Specialized;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace QuartzProject
 {
     class Program
-    {        
+    {
+
+        private static Dictionary<string, IAction> actionsDictionary;
+
+        private static void FillActionsDictionary()
+        {
+            actionsDictionary = new Dictionary<string, IAction>();
+
+            var deleteAction = new DeleteAction();
+            var pauseAction = new PauseAction();
+            var reInitAction = new ReInitAction();
+            var resumeAction = new ResumeAction();
+            var error1 = new InitErrorJobAction();
+            var error2 = new InitErrorJobAction2();
+
+            actionsDictionary.Add(deleteAction.Title.ToLower(), deleteAction);
+            actionsDictionary.Add(pauseAction.Title.ToLower(), pauseAction);
+            actionsDictionary.Add(reInitAction.Title.ToLower(), reInitAction);
+            actionsDictionary.Add(resumeAction.Title.ToLower(), resumeAction);
+            actionsDictionary.Add(error1.Title.ToLower(), error1);
+            actionsDictionary.Add(error2.Title.ToLower(), error2);
+        }
+
+        private static string GetAllAction()
+        {
+            return string.Join(" ", actionsDictionary.Keys);
+        }
+
         static void Main(string[] args)
-        {            
-            
-            Console.WriteLine("Re-Init? y\n");
+        {
+            FillActionsDictionary();
+
+            // В случае разных имен инстанса они будут жить независимо друг от друга.
+            // Если 1 имя, то из 1 инстанса можно влиять на джобы другого.
+
+            Console.WriteLine("Instance name?");
+            var instanceName = Console.ReadLine();
+
+            instanceName = string.IsNullOrEmpty(instanceName) ? "instance_one" : instanceName;
+
+            var currentScheduler = StartUp.StartUp.ConfigurateScheduler(instanceName);
+
+            Console.WriteLine($"Avaible actions: {GetAllAction()}\n");
+            var action = Console.ReadLine();
+
+            if (actionsDictionary.ContainsKey(action.ToLower()))
+            {
+                var props = "";
+
+                if(actionsDictionary[action].ArePropsNeeded)
+                {
+                    props = "Vasyan1";
+                }
+
+                actionsDictionary[action].Execute(currentScheduler, props);
+            }
+
+            Console.WriteLine("Start the scheduler? y = yes\n");
             var res = Console.ReadLine();
 
-            var currentScheduler = ConfigurateScheduler();
-
-            if (res.Equals("y"))
-            {                
-                InitAndStartJob(currentScheduler);                
-            }
-
-            currentScheduler.Start();
-
-            var i = 0;
-            while (true)
+            if(res.Equals("y"))
             {
-                i++;
-                Console.WriteLine(i);
-                Thread.Sleep(1000);
-            }
-        }
+                currentScheduler.Start();
 
-        private static async void InitAndStartJob(IScheduler scheduler)
-        {
-            IJobDetail job = JobBuilder.Create<SimpleJob>()
-                .WithIdentity("simpleJob", "someGroup")
-                .Build();
-            job.JobDataMap.Put("user", new SimpleJobParameter { UserName = "Vasya", Password = "123" });
-            
-            if (await scheduler.CheckExists(job.Key))
-            {
-                Console.WriteLine("Job already exists!");
+                var i = 0;
+                while (true)
+                {
+                    i++;
+                    Console.WriteLine(i);
+                    Thread.Sleep(1000);
 
-                //Если захотим по-новой создать, нужно сначал удалить, иначе будет краш бд
-                //scheduler.DeleteJob(job.Key);
-            }
-            else
-            {
-                Console.WriteLine("It's ok. You can schedule this job.");
-
-                ITrigger trigger = TriggerBuilder.Create()
-                    .UsingJobData("triggerparam", "Some trigger param")
-                    .WithIdentity("someTrigger", "triggerGroup")
-                    .StartNow()
-                    //1ый способ
-                    .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(2)).RepeatForever())
-                    //2й способ
-                    //.WithDailyTimeIntervalSchedule(
-                    //    x => x.StartingDailyAt(TimeOfDay.HourAndMinuteOfDay(0, 0))
-                    //    .OnDaysOfTheWeek(DayOfWeek.Monday, DayOfWeek.Wednesday)
-                    //    .EndingDailyAfterCount(22)
-                    //    .WithRepeatCount(5))
-                    //3й способ
-                    //.WithCronSchedule("0 0/1 * 1/1 * ? *")
-                    .Build();                    
-
-                await scheduler.ScheduleJob(job, trigger);
-            }
-        }
-
-        private static IScheduler ConfigurateScheduler()
-        {
-            NameValueCollection props = new NameValueCollection();
-
-            props["quartz.serializer.type"] = "json";
-            props["quartz.scheduler.instanceName"] = "TestScheduler";
-            //props["quartz.scheduler.instanceId"] = "instance_one";
-            props["quartz.jobStore.type"] = "Quartz.Impl.AdoJobStore.JobStoreTX, Quartz";
-            // Нужно понять как поставить true
-            props["quartz.jobStore.useProperties"] = "false";
-            props["quartz.jobStore.dataSource"] = "default";
-            props["quartz.jobStore.tablePrefix"] = "QRTZ_";
-            props["quartz.dataSource.default.connectionString"] = "Data Source=localhost:1521/xe;User Id=NewUser;Password=123456;";
-            props["quartz.dataSource.default.provider"] = "OracleODP";
-            props["quartz.jobStore.driverDelegateType"] = "Quartz.Impl.AdoJobStore.OracleDelegate, Quartz";
-
-            StdSchedulerFactory factory = new StdSchedulerFactory(props);
-            var scheduler = factory.GetScheduler().Result;
-            
-            return scheduler;
+                    var count = currentScheduler.GetCurrentlyExecutingJobs().Result;
+                    Console.WriteLine($"Currently Executing Jobs Count = {count?.Count}");
+                }
+            }            
         }
     }
 }
