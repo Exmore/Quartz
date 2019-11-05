@@ -6,7 +6,7 @@ namespace QuartzProject.Actions
 {
     public class ResumeAction : IAction
     {
-        public async void Execute(IScheduler scheduler, params object[] props)
+        public async void Execute(IScheduler scheduler)
         {
             var job = GetJobDetail();
 
@@ -19,12 +19,33 @@ namespace QuartzProject.Actions
 
         private IJobDetail GetJobDetail()
         {
-            Console.WriteLine("1 or 2?");
+            Console.WriteLine("1 2 3 4 5?");
 
             if (Console.ReadLine().Equals("1"))
             {
                 IJobDetail job = JobBuilder.Create<SimpleJob>()
                     .WithIdentity("simpleJob", "someGroup")
+                    .Build();
+                return job;
+            }
+            else if (Console.ReadLine().Equals("2"))
+            {
+                IJobDetail job = JobBuilder.Create<SecondJob>()
+                    .WithIdentity("secondJob", "someGroup")
+                    .Build();
+                return job;
+            }
+            else if (Console.ReadLine().Equals("3"))
+            {
+                IJobDetail job = JobBuilder.Create<SecondJob>()
+                    .WithIdentity("secondJob", "someGroup")
+                    .Build();
+                return job;
+            }
+            else if (Console.ReadLine().Equals("4"))
+            {
+                IJobDetail job = JobBuilder.Create<SecondJob>()
+                    .WithIdentity("secondJob", "someGroup")
                     .Build();
                 return job;
             }
@@ -38,6 +59,5 @@ namespace QuartzProject.Actions
         }
 
         public string Title => "Resume";
-        public bool ArePropsNeeded => false;        
     }
 }

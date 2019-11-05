@@ -26,7 +26,7 @@ namespace QuartzProject.Actions
             }
         }
 
-        public async void Execute(IScheduler scheduler, params object[] props)
+        public async void Execute(IScheduler scheduler)
         {
             var job = GetJobDetail();
 
@@ -38,6 +38,5 @@ namespace QuartzProject.Actions
         }
 
         public string Title => "Pause";
-        public bool ArePropsNeeded => false;
     }
 }

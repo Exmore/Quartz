@@ -19,7 +19,7 @@ namespace QuartzProject.Jobs
             var user = (SimpleJobParameter)dataMap.Get("user");
 
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine($"Hello from job. UserName = {user?.UserName}, Password = {user?.Password}. TriggerParama = {triggerparam}.");
+            Console.WriteLine($"Hello from job. UserName = {user?.UserName}, Password = {user?.Password}. TriggerParama = {triggerparam}. Time = {DateTime.Now}");
             Console.ResetColor();            
         }
     }

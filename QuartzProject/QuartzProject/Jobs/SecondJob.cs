@@ -5,9 +5,10 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace QuartzProject.Jobs
-{    
+{
+    [DisallowConcurrentExecution]
     public class SecondJob : IJob
-    {
+    {        
         public async Task Execute(IJobExecutionContext context)
         {
             Thread.Sleep(1000);
@@ -21,4 +22,54 @@ namespace QuartzProject.Jobs
             Console.ResetColor();
         }
     }
+
+    [DisallowConcurrentExecution]
+    public class SecondJob2 : IJob
+    {        
+        public async Task Execute(IJobExecutionContext context)
+        {
+            Thread.Sleep(1000);
+            JobDataMap dataMap = context.MergedJobDataMap;
+
+            string triggerparam = dataMap.GetString("triggerparam");
+            var user = (SecondJobParameter)dataMap.Get("user");
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine($"Hello from job. UserName = {user?.UserName}, Password = {user?.Password}. TriggerParama = {triggerparam}");
+            Console.ResetColor();
+        }
+    }    
+    [DisallowConcurrentExecution]
+    public class SecondJob3 : IJob
+    {        
+        public async Task Execute(IJobExecutionContext context)
+        {
+            Thread.Sleep(1000);
+            JobDataMap dataMap = context.MergedJobDataMap;
+
+            string triggerparam = dataMap.GetString("triggerparam");
+            var user = (SecondJobParameter)dataMap.Get("user");
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"Hello from job. UserName = {user?.UserName}, Password = {user?.Password}. TriggerParama = {triggerparam}");
+            Console.ResetColor();
+        }
+    }    
+
+    [DisallowConcurrentExecution]
+    public class SecondJob4 : IJob
+    {        
+        public async Task Execute(IJobExecutionContext context)
+        {
+            Thread.Sleep(1000);
+            JobDataMap dataMap = context.MergedJobDataMap;
+
+            string triggerparam = dataMap.GetString("triggerparam");
+            var user = (SecondJobParameter)dataMap.Get("user");
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"Hello from job. UserName = {user?.UserName}, Password = {user?.Password}. TriggerParama = {triggerparam}");
+            Console.ResetColor();
+        }
+    }    
 }

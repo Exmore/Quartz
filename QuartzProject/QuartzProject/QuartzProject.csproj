@@ -116,6 +116,7 @@
     <Compile Include="Actions\PauseAction.cs" />
     <Compile Include="Actions\ReInitAction.cs" />
     <Compile Include="Actions\ResumeAction.cs" />
+    <Compile Include="Actions\RescheduleJobAction.cs" />
     <Compile Include="Jobs\ErrorJob.cs" />
     <Compile Include="Jobs\ErrorJob2.cs" />
     <Compile Include="Jobs\SecondJob.cs" />

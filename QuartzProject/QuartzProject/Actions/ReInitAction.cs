@@ -7,82 +7,124 @@ namespace QuartzProject.Actions
 {
     public class ReInitAction : IAction
     {
-        private IJobDetail GetJobDetail()
+        public async void Execute(IScheduler scheduler)
         {
-            return null;
-        }
+            var props = GetPropsMethod();
 
-        public async void Execute(IScheduler scheduler, params object[] props)
-        {
             var name = props.Length > 0 ? props[0].ToString() : "Vasyan";
             var password = props.Length > 1 ? props[1].ToString() : "VasyanPasswords";
 
-            Console.WriteLine("1 or 2?");
+            Console.WriteLine("1 2 3 4 5? (1 раз в 5 секунд, остальные каждую секунду)");
 
             IJobDetail job;
+            var triggerName = "";
 
-            if (Console.ReadLine().Equals("1"))
+            var value = Console.ReadLine();
+
+            if (value.Equals("1"))
             {
                 job = JobBuilder.Create<SimpleJob>()
-                    .WithIdentity("simpleJob", "someGroup")
-                    .Build();
+                    .WithIdentity("simpleJob", "someGroup")                    
+                    .Build();                
 
                 job.JobDataMap.Put("user", new SimpleJobParameter { UserName = name, Password = password });
-                Ex(scheduler, job);
+
+                if (await scheduler.CheckExists(job.Key))
+                {
+                    Console.WriteLine("Job already exists!");
+                    await scheduler.DeleteJob(job.Key);
+                }
+
+                triggerName = "simpleJobTrigger";
             }
-            else
+            else if (value.Equals("2"))
             {
                 job = JobBuilder.Create<SecondJob>()
                     .WithIdentity("secondJob", "someGroup")
                     .Build();
 
                 job.JobDataMap.Put("user", new SecondJobParameter { UserName = name, Password = password });
-                Ex(scheduler, job, "secondTrigger");
+
+                if (await scheduler.CheckExists(job.Key))
+                {
+                    Console.WriteLine("Job already exists!");
+                    await scheduler.DeleteJob(job.Key);
+                }
+
+                triggerName = "secondJobTrigger";
             }
-
-
-        }
-
-        private async void Ex(IScheduler scheduler, IJobDetail job, string triggerName = "someTrigger")
-        {
-            if (await scheduler.CheckExists(job.Key))
+            else if (value.Equals("3"))
             {
-                Console.WriteLine("Job already exists!");
-
-                //Если захотим по-новой создать, нужно сначал удалить, иначе будет краш бд
-                await scheduler.DeleteJob(job.Key);
-
-                var trigger = TriggerBuilder.Create()
-                    .UsingJobData("triggerparam", "Some trigger param")
-                    .WithIdentity(triggerName, "triggerGroup")
-                    .WithSimpleSchedule(x => x
-                        .WithInterval(TimeSpan.FromSeconds(2))
-                        .RepeatForever()
-                    )
+                job = JobBuilder.Create<SecondJob2>()
+                    .WithIdentity("secondJob2", "someGroup")
                     .Build();
 
-                await scheduler.ScheduleJob(job, trigger);
+                job.JobDataMap.Put("user", new SecondJobParameter { UserName = name, Password = password });
 
-                Console.WriteLine("Job has been recreated!");
+                if (await scheduler.CheckExists(job.Key))
+                {
+                    Console.WriteLine("Job already exists!");
+                    await scheduler.DeleteJob(job.Key);
+                }
+
+                triggerName = "secondJobTrigger2";
+            }
+            else if (value.Equals("4"))
+            {
+                job = JobBuilder.Create<SecondJob3>()
+                    .WithIdentity("secondJob3", "someGroup")
+                    .Build();
+
+                job.JobDataMap.Put("user", new SecondJobParameter { UserName = name, Password = password });
+
+                if (await scheduler.CheckExists(job.Key))
+                {
+                    Console.WriteLine("Job already exists!");
+                    await scheduler.DeleteJob(job.Key);
+                }
+
+                triggerName = "secondJobTrigger3";
             }
             else
             {
-                Console.WriteLine("It's ok. You can schedule this job.");
-
-                var trigger = TriggerBuilder.Create()
-                    .UsingJobData("triggerparam", "Some trigger param")
-                    .WithIdentity(triggerName, "triggerGroup")
-                    .WithSimpleSchedule(x => x
-                        .WithInterval(TimeSpan.FromSeconds(2))
-                        .RepeatForever()
-                    )
+                job = JobBuilder.Create<SecondJob4>()
+                    .WithIdentity("secondJob4", "someGroup")
                     .Build();
 
-                await scheduler.ScheduleJob(job, trigger);
+                job.JobDataMap.Put("user", new SecondJobParameter { UserName = name, Password = password });
+
+                if (await scheduler.CheckExists(job.Key))
+                {
+                    Console.WriteLine("Job already exists!");
+                    await scheduler.DeleteJob(job.Key);
+                }
+
+                triggerName = "secondJobTrigger4";
             }
+
+            var trigger = TriggerBuilder.Create()
+                .UsingJobData("triggerparam", "Some trigger param")
+                .WithIdentity(triggerName, "triggerGroup")
+                .WithSimpleSchedule(x => x
+                    .WithInterval(TimeSpan.FromSeconds(2))
+                    .RepeatForever()
+                )                
+                .Build();            
+
+            await scheduler.ScheduleJob(job, trigger);
+            Console.WriteLine("Job has been recreated!");
+        }
+
+        public string[] GetPropsMethod()
+        {
+            var props = new string[2];
+            Console.WriteLine("Введите имя");
+            props[0] = Console.ReadLine();
+            Console.WriteLine("Введите пароль");
+            props[1] = Console.ReadLine();
+            return props;
         }
 
         public string Title => "ReInit";
-        public bool ArePropsNeeded => true;
     }
 }

@@ -6,11 +6,9 @@ namespace QuartzProject.Actions
 {
     public class InitErrorJobAction : IAction
     {
-        public string Title => "InitErrorJobAction";
+        public string Title => "InitErrorJob";
 
-        public bool ArePropsNeeded => false;
-
-        public async void Execute(IScheduler scheduler, params object[] props)
+        public async void Execute(IScheduler scheduler)
         {
             var triggerName = "tr1";
 
@@ -58,11 +56,11 @@ namespace QuartzProject.Actions
 
     public class InitErrorJobAction2 : IAction
     {
-        public string Title => "InitErrorJobAction2";
+        public string Title => "InitErrorJob2";
 
         public bool ArePropsNeeded => false;
 
-        public async void Execute(IScheduler scheduler, params object[] props)
+        public async void Execute(IScheduler scheduler)
         {
             var triggerName = "tr1";
 

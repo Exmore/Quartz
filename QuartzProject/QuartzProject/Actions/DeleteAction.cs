@@ -6,7 +6,7 @@ namespace QuartzProject.Actions
 {
     public class DeleteAction : IAction
     {
-        public async void Execute(IScheduler scheduler, params object[] props)
+        public async void Execute(IScheduler scheduler)
         {
             var job = GetJobDetail();
 
@@ -38,6 +38,5 @@ namespace QuartzProject.Actions
         }
 
         public string Title => "Delete";
-        public bool ArePropsNeeded => false;
     }
 }

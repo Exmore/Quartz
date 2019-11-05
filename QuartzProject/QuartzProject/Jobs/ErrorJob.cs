@@ -8,6 +8,9 @@ namespace QuartzProject.Jobs
     [DisallowConcurrentExecution]
     public class ErrorJob : IJob
     {
+        // Можно через мэпу изменять
+        private static int retriesNumber = 0;
+        private int maximumRetries = 100;
         public async Task Execute(IJobExecutionContext context)
         {
             try
@@ -20,7 +23,17 @@ namespace QuartzProject.Jobs
             {
                 JobExecutionException e2 =
                     new JobExecutionException(e);
-                e2.RefireImmediately = true;
+
+                retriesNumber++;
+                if (retriesNumber >= maximumRetries)
+                {
+                    e2.UnscheduleAllTriggers = true;
+                }
+                else
+                {
+                    e2.RefireImmediately = true;
+                }
+
                 throw e2;
             }
         }

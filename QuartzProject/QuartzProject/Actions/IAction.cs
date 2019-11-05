@@ -4,8 +4,7 @@ namespace QuartzProject.Actions
 {
     public interface IAction
     {
-        void Execute(IScheduler scheduler, params object[] props);       
+        void Execute(IScheduler scheduler);
         string Title { get; }
-        bool ArePropsNeeded { get; }
     }
 }
